@@ -35,6 +35,4 @@
 .idea
 
 # CMake
-build
-build-debug
-cmake-build-debug
+*[Bb][Uu][Ii][Ll][Dd]*/
