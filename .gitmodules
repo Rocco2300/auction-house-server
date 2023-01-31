@@ -1,0 +1,4 @@
+[submodule "extern/mysql-connector-cpp"]
+	path = extern/mysql-connector-cpp
+	url = https://github.com/mysql/mysql-connector-cpp.git
+	branch = 8.0
