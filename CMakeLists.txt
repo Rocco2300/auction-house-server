@@ -4,6 +4,11 @@ project(ah_server)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(ah_server main.cpp)
+include_directories(include)
 
-target_link_libraries(ah_server pthread mysqlcppconn boost_system)
+file(GLOB HEADERS include/*.h)
+
+add_subdirectory(src/network)
+add_executable(ah_server src/main.cpp ${HEADERS})
+
+target_link_libraries(ah_server pthread mysqlcppconn boost_system network)
