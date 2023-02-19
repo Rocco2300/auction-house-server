@@ -64,9 +64,7 @@ void Session::doWrite() {
             net::buffer("Welcome user!"),
             [self](beast::error_code ec, std::size_t bytesTransferred) {
                 if (ec) {
-                    std::cout << "Error in sending welcome message!\n";
-                } else {
-                    std::cout << "Send welcome message!\n";
+                    std::cout << "Error in sending welcome message!\n" << std::flush;
                 }
             }
     );
@@ -83,4 +81,17 @@ void Session::onWrite(beast::error_code ec, std::size_t bytesTransferred) {
     m_buffer.consume(m_buffer.size());
 
     doRead();
+}
+
+void Session::sendMessage(const std::string& message) {
+    auto self = shared_from_this();
+
+    m_websocket.async_write(
+            net::buffer(message),
+            [self](beast::error_code ec, std::size_t bytesTransferred) {
+                if (ec) {
+                    std::cout << "Error in sending message!\n" << std::flush;
+                }
+            }
+    );
 }

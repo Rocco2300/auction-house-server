@@ -26,4 +26,6 @@ public:
     void onRead(beast::error_code ec, std::size_t bytesTransferred);
     void doWrite();
     void onWrite(beast::error_code ec, std::size_t bytesTransferred);
+
+    void sendMessage(const std::string& message);
 };
