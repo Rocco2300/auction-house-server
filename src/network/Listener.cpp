@@ -52,4 +52,6 @@ void Listener::onAccept(beast::error_code ec, tcp::socket socket) {
     } else {
         std::make_shared<Session>(std::move(socket))->run();
     }
+
+    doAccept();
 }

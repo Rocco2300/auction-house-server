@@ -28,6 +28,7 @@ void Session::onAccept(beast::error_code ec) {
         return;
     }
 
+    doWrite();
     doRead();
 }
 
@@ -56,7 +57,20 @@ void Session::onRead(beast::error_code ec, std::size_t bytesTransferred) {
             beast::bind_front_handler(&Session::onWrite, shared_from_this())
     );
 }
-void Session::doWrite() {}
+void Session::doWrite() {
+    auto self = shared_from_this();
+
+    m_websocket.async_write(
+            net::buffer("Welcome user!"),
+            [self](beast::error_code ec, std::size_t bytesTransferred) {
+                if (ec) {
+                    std::cout << "Error in sending welcome message!\n";
+                } else {
+                    std::cout << "Send welcome message!\n";
+                }
+            }
+    );
+}
 
 void Session::onWrite(beast::error_code ec, std::size_t bytesTransferred) {
     boost::ignore_unused(bytesTransferred);
