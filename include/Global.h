@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Session.h"
+#include "Request.h"
 
 #include <memory>
 #include <vector>
 
 namespace global
 {
-inline std::vector<std::weak_ptr<Session>> sessions;
+inline std::vector<Request> requests;
 }

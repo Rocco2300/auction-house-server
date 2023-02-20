@@ -9,16 +9,18 @@ void pollInput()
 {
     while (1)
     {
-        std::string message;
-        std::cout << "Message: ";
-        std::cin  >> message;
-
-        for (auto i = 0; i < global::sessions.size(); i++)
+        while (!global::requests.empty())
         {
-            if (global::sessions[i].expired())
-                continue;
+            auto& currRequest = global::requests.back();
 
-            global::sessions[i].lock()->sendMessage(message);
+            std::string response;
+            response += "response: ";
+            response += currRequest.getData();
+
+            currRequest.setResponse(response);
+            currRequest.sendResponse();
+
+            global::requests.pop_back();
         }
     }
 }

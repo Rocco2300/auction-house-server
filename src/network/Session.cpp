@@ -1,4 +1,5 @@
 #include "Session.h"
+#include "Global.h"
 #include "Logger.h"
 
 #include <boost/asio/dispatch.hpp>
@@ -52,10 +53,13 @@ void Session::onRead(beast::error_code ec, std::size_t bytesTransferred) {
     }
 
     m_websocket.text(m_websocket.got_text());
-    m_websocket.async_write(
-            m_buffer.data(),
-            beast::bind_front_handler(&Session::onWrite, shared_from_this())
+
+    global::requests.push_back(
+            {shared_from_this(), beast::buffers_to_string(m_buffer.data())}
     );
+    m_buffer.consume(m_buffer.size());
+
+    doRead();
 }
 void Session::doWrite() {
     auto self = shared_from_this();
@@ -64,7 +68,8 @@ void Session::doWrite() {
             net::buffer("Welcome user!"),
             [self](beast::error_code ec, std::size_t bytesTransferred) {
                 if (ec) {
-                    std::cout << "Error in sending welcome message!\n" << std::flush;
+                    std::cout << "Error in sending welcome message!\n"
+                              << std::flush;
                 }
             }
     );
@@ -78,7 +83,7 @@ void Session::onWrite(beast::error_code ec, std::size_t bytesTransferred) {
         return;
     }
 
-    m_buffer.consume(m_buffer.size());
+    //    m_buffer.consume(m_buffer.size());
 
     doRead();
 }

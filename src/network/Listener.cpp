@@ -1,7 +1,6 @@
 #include "Listener.h"
-#include "Session.h"
 #include "Logger.h"
-#include "Global.h"
+#include "Session.h"
 
 #include <iostream>
 #include <string>
@@ -51,11 +50,7 @@ void Listener::onAccept(beast::error_code ec, tcp::socket socket) {
     if (ec) {
         logFail(ec, "Accept");
     } else {
-        std::shared_ptr<Session> session;
-        session = std::make_shared<Session>(std::move(socket));
-
-        global::sessions.push_back(session);
-        session->run();
+        std::make_shared<Session>(std::move(socket))->run();
     }
 
     doAccept();
