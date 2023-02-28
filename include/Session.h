@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MessageHandler.h"
+
 #include <memory>
 
 #include <boost/beast/core.hpp>
@@ -15,8 +17,10 @@ private:
     websocket::stream<beast::tcp_stream> m_websocket;
     beast::flat_buffer m_buffer;
 
+    MessageHandler& m_messageHandler;
+
 public:
-    explicit Session(tcp::socket&& socket);
+    explicit Session(tcp::socket&& socket, MessageHandler& messageHandler);
 
     void run();
     void onRun();
@@ -24,7 +28,7 @@ public:
 
     void doRead();
     void onRead(beast::error_code ec, std::size_t bytesTransferred);
-    void doWrite();
+    void doWrite(Message message);
     void onWrite(beast::error_code ec, std::size_t bytesTransferred);
 
     void sendMessage(const std::string& message);

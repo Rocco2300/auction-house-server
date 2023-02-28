@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MessageHandler.h"
+
 #include <memory>
 
 #include <boost/beast/core.hpp>
@@ -13,6 +15,8 @@ class Listener : public std::enable_shared_from_this<Listener> {
 private:
     net::io_context& m_ioc;
     tcp::acceptor    m_acceptor;
+
+    MessageHandler m_messageHandler;
 
 public:
     Listener(net::io_context& ioc, tcp::endpoint endpoint);

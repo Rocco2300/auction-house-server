@@ -35,6 +35,8 @@ Listener::Listener(net::io_context& ioc, tcp::endpoint endpoint)
         logFail(ec, "Listen");
         return;
     }
+
+    m_messageHandler.run();
 }
 
 void Listener::run() { doAccept(); }
@@ -50,7 +52,7 @@ void Listener::onAccept(beast::error_code ec, tcp::socket socket) {
     if (ec) {
         logFail(ec, "Accept");
     } else {
-        std::make_shared<Session>(std::move(socket))->run();
+        std::make_shared<Session>(std::move(socket), m_messageHandler)->run();
     }
 
     doAccept();

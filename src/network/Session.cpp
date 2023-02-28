@@ -1,11 +1,13 @@
 #include "Session.h"
-#include "Global.h"
 #include "Logger.h"
 
 #include <boost/asio/dispatch.hpp>
 
-Session::Session(tcp::socket&& socket)
-    : m_websocket(std::move(socket)) {}
+using namespace std::placeholders;
+
+Session::Session(tcp::socket&& socket, MessageHandler& messageHandler)
+    : m_websocket(std::move(socket))
+    , m_messageHandler(messageHandler) {}
 
 void Session::run() {
     net::dispatch(
@@ -29,7 +31,17 @@ void Session::onAccept(beast::error_code ec) {
         return;
     }
 
-    doWrite();
+    auto self = shared_from_this();
+    m_websocket.async_write(
+            net::buffer("Welcome user!"),
+            [self](beast::error_code ec, std::size_t bytesTransferred) {
+                if (ec) {
+                    std::cout << "Error in sending welcome message!\n"
+                              << std::flush;
+                }
+            }
+    );
+
     doRead();
 }
 
@@ -54,24 +66,22 @@ void Session::onRead(beast::error_code ec, std::size_t bytesTransferred) {
 
     m_websocket.text(m_websocket.got_text());
 
-    global::requests.push_back(
-            {shared_from_this(), beast::buffers_to_string(m_buffer.data())}
+    m_messageHandler.enqueueRequest(
+            beast::buffers_to_string(m_buffer.data()),
+            std::bind(&Session::doWrite, shared_from_this(), _1)
     );
+
     m_buffer.consume(m_buffer.size());
 
     doRead();
 }
-void Session::doWrite() {
+
+void Session::doWrite(Message message) {
     auto self = shared_from_this();
 
     m_websocket.async_write(
-            net::buffer("Welcome user!"),
-            [self](beast::error_code ec, std::size_t bytesTransferred) {
-                if (ec) {
-                    std::cout << "Error in sending welcome message!\n"
-                              << std::flush;
-                }
-            }
+            net::buffer(message),
+            beast::bind_front_handler(&Session::onWrite, shared_from_this())
     );
 }
 
@@ -82,10 +92,6 @@ void Session::onWrite(beast::error_code ec, std::size_t bytesTransferred) {
         logFail(ec, "Write");
         return;
     }
-
-    //    m_buffer.consume(m_buffer.size());
-
-    doRead();
 }
 
 void Session::sendMessage(const std::string& message) {
