@@ -20,6 +20,8 @@ private:
     MessageHandler& m_messageHandler;
 
 public:
+
+public:
     explicit Session(tcp::socket&& socket, MessageHandler& messageHandler);
 
     void run();
@@ -33,3 +35,5 @@ public:
 
     void sendMessage(const std::string& message);
 };
+
+using SessionPtr = std::shared_ptr<Session>;
