@@ -1,8 +1,8 @@
 #include "Session.h"
 #include "Logger.h"
 
-#include <boost/asio/dispatch.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/asio/dispatch.hpp>
 
 using namespace std::placeholders;
 
@@ -61,6 +61,7 @@ void Session::onRead(beast::error_code ec, std::size_t bytesTransferred) {
     boost::ignore_unused(bytesTransferred);
 
     if (ec == websocket::error::closed) {
+        m_sessionManager.disconnectSession(m_username);
         return;
     }
 
@@ -75,14 +76,18 @@ void Session::onRead(beast::error_code ec, std::size_t bytesTransferred) {
     if (message.find("username") != std::string::npos) {
         auto usernamePos =
                 message.find("username") + std::string("username").length() + 1;
-        auto ending   = message.find(";");
-        auto username = message.substr(usernamePos, ending - 1);
-        boost::trim(username);
-        m_sessionManager.registerSession(username, shared_from_this());
+        auto ending = message.find(";");
+
+        if (m_username.length() == 0) {
+            m_username = message.substr(usernamePos, ending - 1);
+            boost::trim(m_username);
+            m_sessionManager.registerSession(m_username, shared_from_this());
+        }
     }
 
     m_messageHandler.enqueueRequest(
-            message, std::bind(&Session::doWrite, shared_from_this(), _1)
+            message, [capture0 = shared_from_this()](auto&& PH1
+                     ) { capture0->doWrite(std::forward<decltype(PH1)>(PH1)); }
     );
 
     m_buffer.consume(m_buffer.size());

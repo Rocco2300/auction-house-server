@@ -16,7 +16,9 @@ public:
     SessionManager() = default;
 
     bool isConnected(std::string key);
+    void disconnectSession(std::string key);
     void registerSession(std::string key, SessionPtr session);
+
 
     SessionPtr getSession(std::string key);
 };
