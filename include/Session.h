@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MessageHandler.h"
+#include "SessionManager.h"
 
 #include <memory>
 
@@ -18,11 +19,13 @@ private:
     beast::flat_buffer m_buffer;
 
     MessageHandler& m_messageHandler;
+    SessionManager& m_sessionManager;
 
 public:
 
 public:
-    explicit Session(tcp::socket&& socket, MessageHandler& messageHandler);
+    explicit Session(tcp::socket&& socket, MessageHandler& messageHandler,
+                     SessionManager& sessionManager);
 
     void run();
     void onRun();

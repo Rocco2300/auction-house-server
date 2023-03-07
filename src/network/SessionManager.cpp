@@ -1,5 +1,6 @@
 #include "SessionManager.h"
 
+#include <iostream>
 #include <stdexcept>
 
 bool SessionManager::isConnected(std::string key) {
@@ -8,6 +9,11 @@ bool SessionManager::isConnected(std::string key) {
 
 void SessionManager::registerSession(std::string key, SessionPtr session) {
     m_sessions.insert({key, session});
+
+    for (const auto& [username, ptr] : m_sessions)
+    {
+        std::cout << username << ' ' << ptr.get() << '\n';
+    }
 }
 
 SessionPtr SessionManager::getSession(std::string key) {

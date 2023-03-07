@@ -2,12 +2,17 @@
 #include "Logger.h"
 
 #include <boost/asio/dispatch.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std::placeholders;
 
-Session::Session(tcp::socket&& socket, MessageHandler& messageHandler)
+Session::Session(
+        tcp::socket&& socket, MessageHandler& messageHandler,
+        SessionManager& sessionManager
+)
     : m_websocket(std::move(socket))
-    , m_messageHandler(messageHandler) {}
+    , m_messageHandler(messageHandler)
+    , m_sessionManager(sessionManager) {}
 
 void Session::run() {
     net::dispatch(
@@ -66,9 +71,18 @@ void Session::onRead(beast::error_code ec, std::size_t bytesTransferred) {
 
     m_websocket.text(m_websocket.got_text());
 
+    auto message = beast::buffers_to_string(m_buffer.data());
+    if (message.find("username") != std::string::npos) {
+        auto usernamePos =
+                message.find("username") + std::string("username").length() + 1;
+        auto ending   = message.find(";");
+        auto username = message.substr(usernamePos, ending - 1);
+        boost::trim(username);
+        m_sessionManager.registerSession(username, shared_from_this());
+    }
+
     m_messageHandler.enqueueRequest(
-            beast::buffers_to_string(m_buffer.data()),
-            std::bind(&Session::doWrite, shared_from_this(), _1)
+            message, std::bind(&Session::doWrite, shared_from_this(), _1)
     );
 
     m_buffer.consume(m_buffer.size());

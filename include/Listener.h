@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MessageHandler.h"
+#include "SessionManager.h"
 
 #include <memory>
 
@@ -16,7 +17,8 @@ private:
     net::io_context& m_ioc;
     tcp::acceptor    m_acceptor;
 
-    MessageHandler m_messageHandler;
+    MessageHandler m_messageHandler{};
+    SessionManager m_sessionManager{};
 
 public:
     Listener(net::io_context& ioc, tcp::endpoint endpoint);

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SessionManager.h"
-
 #include <functional>
 #include <queue>
 #include <string>
