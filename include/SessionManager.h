@@ -1,6 +1,13 @@
 #pragma once
 
-#include "Session.h"
+#include <memory>
+#include <string>
+#include <sstream>
+#include <unordered_map>
+
+class Session;
+
+using SessionPtr = std::shared_ptr<Session>;
 
 class SessionManager {
 private:

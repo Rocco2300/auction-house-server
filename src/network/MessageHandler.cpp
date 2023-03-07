@@ -1,6 +1,5 @@
 #include "MessageHandler.h"
 
-
 void MessageHandler::enqueueRequest(Message message, MessageCallback callback) {
     m_requestQueue.push({message, callback});
 }
