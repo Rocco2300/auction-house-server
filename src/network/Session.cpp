@@ -75,8 +75,7 @@ void Session::onRead(beast::error_code ec, std::size_t bytesTransferred) {
     }
 
     m_messageHandler.enqueueRequest(
-            message, [capture0 = shared_from_this()](auto&& PH1
-                     ) { capture0->doWrite(std::forward<decltype(PH1)>(PH1)); }
+            message, std::bind(&Session::doWrite, shared_from_this(), _1)
     );
 
     m_buffer.consume(m_buffer.size());
