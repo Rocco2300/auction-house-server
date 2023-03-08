@@ -36,17 +36,6 @@ void Session::onAccept(beast::error_code ec) {
         return;
     }
 
-    auto self = shared_from_this();
-    m_websocket.async_write(
-            net::buffer("Welcome user!"),
-            [self](beast::error_code ec, std::size_t bytesTransferred) {
-                if (ec) {
-                    std::cout << "Error in sending welcome message!\n"
-                              << std::flush;
-                }
-            }
-    );
-
     doRead();
 }
 
