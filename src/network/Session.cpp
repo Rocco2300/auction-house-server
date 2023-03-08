@@ -65,7 +65,7 @@ void Session::onRead(beast::error_code ec, std::size_t bytesTransferred) {
     if (message.find("username") != std::string::npos) {
         auto usernamePos =
                 message.find("username") + std::string("username").length() + 1;
-        auto ending = message.find(";");
+        auto ending = message.find(';');
 
         if (m_username.length() == 0) {
             m_username = message.substr(usernamePos, ending - 1);

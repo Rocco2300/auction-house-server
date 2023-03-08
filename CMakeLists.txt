@@ -7,8 +7,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 include_directories(include)
 
 file(GLOB HEADERS include/*.h)
+file(GLOB SOURCES src/*.cpp)
 
 add_subdirectory(src/network)
-add_executable(ah_server src/main.cpp ${HEADERS})
+add_executable(ah_server ${SOURCES} ${HEADERS})
 
 target_link_libraries(ah_server pthread mysqlcppconn boost_system network)
