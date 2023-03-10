@@ -6,6 +6,8 @@
 #include <thread>
 #include <utility>
 
+#include <nlohmann/json.hpp>
+
 using Message         = std::string;
 using MessageCallback = std::function<void(std::string)>;
 
@@ -23,4 +25,6 @@ public:
 private:
     void    handleMessages();
     Message getResponse(Message request);
+
+    bool handleLogin(nlohmann::json jsonRequest);
 };

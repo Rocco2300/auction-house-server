@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <nlohmann/json.hpp>
+#include <sqlite3.h>
 
 using json = nlohmann::json;
 
@@ -43,10 +43,43 @@ Message MessageHandler::getResponse(Message request) {
     } else if (action == "order") {
         return "ordered";
     } else if (action == "login") {
-        std::string username = j["data"]["username"];
-        std::string password = j["data"]["password"];
-
-        std::cout << username << ' ' << password << '\n';
+        handleLogin(j);
+        return "login";
     }
     return "invalid request";
+}
+
+bool MessageHandler::handleLogin(json jsonRequest) {
+    sqlite3*    dbHandle;
+    int         ret = sqlite3_open("../db/auction_house.db", &dbHandle);
+    char*       errorMessage;
+    std::string data = "CALLBACK";
+
+    if (ret) {
+        std::cerr << "Error opening db\n";
+        return false;
+    }
+
+    sqlite3_stmt* stmt;
+
+    std::string query = "SELECT user_id FROM users WHERE username = ?";
+    ret = sqlite3_prepare_v2(dbHandle, query.c_str(), query.length(), &stmt, 0);
+    if (ret) {
+        std::cerr << "Prepare failed\n";
+    }
+
+    std::string username = jsonRequest["data"]["username"];
+    std::cout << "Bind ret: "
+              << sqlite3_bind_text(
+                         stmt, 1, username.c_str(), username.length(), nullptr
+                 )
+              << '\n';
+
+    sqlite3_step(stmt);
+
+    std::cout << sqlite3_column_int(stmt, 0) << '\n';
+
+    sqlite3_finalize(stmt);
+
+    return true;
 }
