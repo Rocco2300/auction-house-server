@@ -1,5 +1,11 @@
 #include "MessageHandler.h"
 
+#include <iostream>
+
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 void MessageHandler::enqueueRequest(Message message, MessageCallback callback) {
     m_requestQueue.push({message, callback});
 }
@@ -22,14 +28,25 @@ void MessageHandler::handleMessages() {
 
 // TODO: placeholder
 Message MessageHandler::getResponse(Message request) {
-    if (request == "query") {
+
+    json j = json::parse(request);
+
+    std::cout << j["action"] << std::endl;
+
+    auto action = j["action"];
+    if (action == "query") {
         return "queried";
-    } else if (request == "buy") {
+    } else if (action == "buy") {
         return "bought";
-    } else if (request == "post") {
+    } else if (action == "post") {
         return "posted";
-    } else if (request == "order") {
+    } else if (action == "order") {
         return "ordered";
+    } else if (action == "login") {
+        std::string username = j["data"]["username"];
+        std::string password = j["data"]["password"];
+
+        std::cout << username << ' ' << password << '\n';
     }
     return "invalid request";
 }

@@ -1,9 +1,13 @@
 #include "Session.h"
 #include "Logger.h"
 
+#include <iostream>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/asio/dispatch.hpp>
+#include <nlohmann/json.hpp>
 
+using json = nlohmann::json;
 using namespace std::placeholders;
 
 Session::Session(
@@ -61,15 +65,12 @@ void Session::onRead(beast::error_code ec, std::size_t bytesTransferred) {
 
     m_websocket.text(m_websocket.got_text());
 
-    auto message = beast::buffers_to_string(m_buffer.data());
-    if (message.find("username") != std::string::npos) {
-        auto usernamePos =
-                message.find("username") + std::string("username").length() + 1;
-        auto ending = message.find(';');
-
+    auto        message = beast::buffers_to_string(m_buffer.data());
+    auto        j       = json::parse(message);
+    std::string action  = j["action"];
+    if (action == "login") {
         if (m_username.length() == 0) {
-            m_username = message.substr(usernamePos, ending - 1);
-            boost::trim(m_username);
+            m_username = j["data"]["username"];
             m_sessionManager.registerSession(m_username, shared_from_this());
         }
     }
