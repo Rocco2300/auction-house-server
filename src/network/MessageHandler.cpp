@@ -1,4 +1,5 @@
 #include "MessageHandler.h"
+#include "User.h"
 
 #include <iostream>
 
@@ -62,22 +63,26 @@ bool MessageHandler::handleLogin(json jsonRequest) {
 
     sqlite3_stmt* stmt;
 
-    std::string query = "SELECT user_id FROM users WHERE username = ?";
-    ret = sqlite3_prepare_v2(dbHandle, query.c_str(), query.length(), &stmt, 0);
-    if (ret) {
-        std::cerr << "Prepare failed\n";
-    }
+    User user("admin");
+    user.buildStmt(dbHandle, &stmt);
 
-    std::string username = jsonRequest["data"]["username"];
-    std::cout << "Bind ret: "
-              << sqlite3_bind_text(
-                         stmt, 1, username.c_str(), username.length(), nullptr
-                 )
-              << '\n';
+//    std::string query = "SELECT * FROM users WHERE username = ?";
+//    ret = sqlite3_prepare_v2(dbHandle, query.c_str(), query.length(), &stmt, 0);
+//    if (ret) {
+//        std::cerr << "Prepare failed\n";
+//    }
+//
+//    std::string username = jsonRequest["data"]["username"];
+//    std::cout << "Bind ret: "
+//              << sqlite3_bind_text(
+//                         stmt, 1, username.c_str(), username.length(), nullptr
+//                 )
+//              << '\n';
 
     sqlite3_step(stmt);
 
-    std::cout << sqlite3_column_int(stmt, 0) << '\n';
+    User user2;
+    user2 = stmt;
 
     sqlite3_finalize(stmt);
 
