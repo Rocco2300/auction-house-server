@@ -9,8 +9,8 @@ User::User(std::string username, std::string password)
     , m_password(password) {}
 
 void User::operator=(sqlite3_stmt* stmt) {
-    m_userId = sqlite3_column_int(stmt, 0);
-    m_username = boost::lexical_cast<std::string>(sqlite3_column_text(stmt, 1));
+    m_userId = sqlite3_column_blob(stmt, 0);
+    m_username = static_cast<const char*>(sqlite3_column_blob(stmt, 1));
     m_password = boost::lexical_cast<std::string>(sqlite3_column_text(stmt, 2));
 
     std::cout << m_userId << ' ' << m_username << ' ' << m_password << std::endl;
