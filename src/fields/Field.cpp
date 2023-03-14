@@ -1,12 +1,18 @@
 #include "Field.h"
 
+#include <iostream>
 #include <stdexcept>
 
-std::ostream& operator<<(std::ostream& os, const Field& field) {
+Field::~Field() {
+    std::free(m_data);
+    std::cout << "Freed lol\n";
+}
+
+std::ostream& operator<<(std::ostream& os, Field& field) {
     return field.output(os);
 }
 
-std::istream& operator>>(std::istream& is, const Field& field) {
+std::istream& operator>>(std::istream& is, Field& field) {
     return field.input(is);
 }
 

@@ -14,12 +14,12 @@ public:
     virtual Field& operator=(const char* data);
     virtual Field& operator=(const void* data);
 
-    virtual ~Field() = default;
+    virtual ~Field();
 
-    friend std::ostream& operator<<(std::ostream& os, const Field& field);
-    friend std::istream& operator>>(std::istream& is, const Field& field);
+    friend std::ostream& operator<<(std::ostream& os, Field& field);
+    friend std::istream& operator>>(std::istream& is, Field& field);
 
 protected:
-    virtual std::ostream& output(std::ostream& os) const = 0;
-    virtual std::istream& input(std::istream& is) const  = 0;
+    virtual std::ostream& output(std::ostream& os) = 0;
+    virtual std::istream& input(std::istream& is)  = 0;
 };
