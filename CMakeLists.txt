@@ -4,6 +4,8 @@ project(ah_server)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+enable_testing()
+
 include_directories(include)
 
 file(GLOB HEADERS include/*.h)
@@ -13,6 +15,7 @@ find_package(Boost REQUIRED system)
 find_package(SQLite3 3.37.2 REQUIRED)
 find_package(nlohmann_json 3.10.5 REQUIRED)
 
+add_subdirectory(tests)
 add_subdirectory(src/fields)
 add_subdirectory(src/network)
 add_subdirectory(src/entities)
