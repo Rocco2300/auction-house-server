@@ -5,7 +5,7 @@
 IntField::IntField() { m_data = std::malloc(sizeof(int)); }
 
 IntField::IntField(int data) {
-    m_data = std::malloc(sizeof(int));
+    m_data                     = std::malloc(sizeof(int));
     *static_cast<int*>(m_data) = data;
 }
 
@@ -24,6 +24,10 @@ IntField& IntField::operator=(int data) {
 }
 
 IntField& IntField::operator=(const void* data) {
+    if (!data) {
+        return *this;
+    }
+
     if (!m_data) {
         m_data = std::malloc(sizeof(int));
     }
