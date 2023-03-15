@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <stdexcept>
 
 #include <boost/lexical_cast.hpp>
 
@@ -57,8 +58,7 @@ public:
 
     Field& operator=(int value) {
         if (!isInteger()) {
-            std::cout << "Non\n";
-            throw;
+            throw std::invalid_argument("Cannot assign int to another type");
         }
 
         *static_cast<int* const>(m_value) = value;
@@ -67,8 +67,7 @@ public:
 
     Field& operator=(float value) {
         if (!isFloating()) {
-            std::cout << "Non\n";
-            throw;
+            throw std::invalid_argument("Cannot assign float to another type");
         }
 
         *static_cast<float* const>(m_value) = value;
@@ -77,8 +76,7 @@ public:
 
     Field& operator=(std::string value) {
         if (!isString()) {
-            std::cout << "Non\n";
-            throw;
+            throw std::invalid_argument("Cannot assign string to another type");
         }
 
         *static_cast<std::string* const>(m_value) = value;
@@ -87,8 +85,7 @@ public:
 
     Field& operator=(const char* value) {
         if (!isString()) {
-            std::cout << "Non\n";
-            throw;
+            throw std::invalid_argument("Cannot assign string to another type");
         }
 
         *static_cast<std::string* const>(m_value) = value;
@@ -97,8 +94,7 @@ public:
 
     operator int() {
         if (!isNumeric()) {
-            std::cout << "Non\n";
-            throw;
+            throw std::bad_cast();
         }
 
         if (isFloating()) {
