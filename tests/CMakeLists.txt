@@ -9,7 +9,6 @@ file(GLOB HEADERS include/*.h)
 include_directories(../include)
 
 add_executable(field_test field_test.cpp ${HEADERS})
-target_link_libraries(field_test fields)
 target_link_libraries(field_test GTest::gtest_main)
 
 add_test(field_test field_test)
