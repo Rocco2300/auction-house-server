@@ -22,16 +22,16 @@ TEST(field, invalid_assign) {
 }
 
 TEST(field, int_cast) {
-    int   intRef = 2;
-    Field intField(intRef);
+    int         intRef    = 2;
+    float       floatRef  = 2.32f;
+    std::string stringRef = "22.f";
 
-    int         castInt;
-    float       castFloat;
-    std::string castString;
+    Field intField(intRef);
+    Field floatField(floatRef);
+    Field stringField(stringRef);
 
     EXPECT_NO_THROW(static_cast<int>(intField));
+    EXPECT_NO_THROW(static_cast<int>(floatField));
 
-    EXPECT_NO_THROW(castInt = intField);
-    EXPECT_NO_THROW(castFloat = intField);
-    EXPECT_NO_THROW(castString = intField);
+    EXPECT_THROW(static_cast<int>(stringField), std::exception);
 }
