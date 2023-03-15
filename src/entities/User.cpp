@@ -1,6 +1,6 @@
 #include "User.h"
 
-#include <iostream>
+#include "Field.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -9,7 +9,10 @@ User::User(std::string username, std::string password)
     , m_password(password) {}
 
 void User::operator=(sqlite3_stmt* stmt) {
-    m_userId = sqlite3_column_blob(stmt, 0);
+    // TODO: TEMP COMMENT UNTIL FIELD FIX
+    // m_userId = sqlite3_column_blob(stmt, 0);
+    Field field(m_userId);
+    field = sqlite3_column_blob(stmt, 0);
     m_username = static_cast<const char*>(sqlite3_column_blob(stmt, 1));
     m_password = boost::lexical_cast<std::string>(sqlite3_column_text(stmt, 2));
 

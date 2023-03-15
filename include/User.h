@@ -1,7 +1,5 @@
 #pragma once
 
-#include "IntField.h"
-
 #include <string>
 
 #include <sqlite3.h>
@@ -9,7 +7,7 @@
 class User
 {
 private:
-    IntField m_userId;
+    int m_userId;
     std::string m_username;
     std::string m_password;
 

@@ -1,25 +1,136 @@
 #pragma once
 
-#include <istream>
-#include <ostream>
+#include <iostream>
+
+#include <boost/lexical_cast.hpp>
 
 class Field {
-protected:
-    void* m_data{};
+private:
+    enum class ValueType {
+        String,
+        Integer,
+        Floating
+    };
 
 public:
-    virtual Field& operator=(int data);
-    virtual Field& operator=(float data);
-    virtual Field& operator=(bool data);
-    virtual Field& operator=(const char* data);
-    virtual Field& operator=(const void* data);
+    using Type  = ValueType;
+    using Value = void* const;
 
-    virtual ~Field();
+private:
+    Type  m_type{};
+    Value m_value{};
 
-    friend std::ostream& operator<<(std::ostream& os, Field& field);
-    friend std::istream& operator>>(std::istream& is, Field& field);
+public:
+    Field() = default;
+    Field(int& value)
+        : m_type(Type::Integer)
+        , m_value(&value) {}
+    Field(float& value)
+        : m_type(Type::Floating)
+        , m_value(&value) {}
+    Field(std::string& value)
+        : m_type(Type::String)
+        , m_value(&value) {}
 
-protected:
-    virtual std::ostream& output(std::ostream& os) = 0;
-    virtual std::istream& input(std::istream& is)  = 0;
+    // This constructor is used for db interface
+    // and atm sqlite3 returns blob as a char array
+    // so we first convert to char and then work with that
+    Field& operator=(const void* value) {
+        using boost::lexical_cast;
+
+        auto buffer = static_cast<const char*>(value);
+
+        switch (m_type) {
+        case Type::Integer:
+            *static_cast<int* const>(m_value) = lexical_cast<int>(buffer);
+            break;
+        case Type::Floating:
+            *static_cast<float* const>(m_value) = lexical_cast<float>(buffer);
+            break;
+        case Type::String:
+            *static_cast<std::string* const>(m_value) = buffer;
+            break;
+        }
+
+        return *this;
+    }
+
+    Field& operator=(int value) {
+        if (!isInteger()) {
+            std::cout << "Non\n";
+            throw;
+        }
+
+        *static_cast<int* const>(m_value) = value;
+        return *this;
+    }
+
+    Field& operator=(float value) {
+        if (!isFloating()) {
+            std::cout << "Non\n";
+            throw;
+        }
+
+        *static_cast<float* const>(m_value) = value;
+        return *this;
+    }
+
+    Field& operator=(std::string value) {
+        if (!isString()) {
+            std::cout << "Non\n";
+            throw;
+        }
+
+        *static_cast<std::string* const>(m_value) = value;
+        return *this;
+    }
+
+    Field& operator=(const char* value) {
+        if (!isString()) {
+            std::cout << "Non\n";
+            throw;
+        }
+
+        *static_cast<std::string* const>(m_value) = value;
+        return *this;
+    }
+
+    operator int() {
+        if (!isNumeric()) {
+            std::cout << "Non\n";
+            throw;
+        }
+
+        if (isFloating()) {
+            float val = *static_cast<float*>(m_value);
+            return static_cast<int>(val);
+        }
+
+        return *static_cast<int*>(m_value);
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Field& field) {
+        switch (field.m_type) {
+        case Type::Integer:
+            os << *static_cast<int*>(field.m_value);
+            break;
+        case Type::Floating:
+            os << *static_cast<float*>(field.m_value);
+            break;
+        case Type::String:
+            os << *static_cast<std::string*>(field.m_value);
+            break;
+        };
+
+        return os;
+    }
+
+private:
+    bool isInteger() { return m_type == Type::Integer; }
+
+    bool isFloating() { return m_type == Type::Floating; }
+
+    bool isNumeric() { return isInteger() || isFloating(); }
+
+    bool isString() { return m_type == Type::String; }
 };
