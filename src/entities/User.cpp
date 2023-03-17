@@ -9,14 +9,12 @@ User::User(std::string username, std::string password)
     , m_password(password) {}
 
 void User::operator=(sqlite3_stmt* stmt) {
-    // TODO: TEMP COMMENT UNTIL FIELD FIX
-    // m_userId = sqlite3_column_blob(stmt, 0);
-    Field field(m_userId);
-    field = sqlite3_column_blob(stmt, 0);
-    m_username = static_cast<const char*>(sqlite3_column_blob(stmt, 1));
-    m_password = boost::lexical_cast<std::string>(sqlite3_column_text(stmt, 2));
+    fields["userId"]   = sqlite3_column_blob(stmt, 0);
+    fields["username"] = sqlite3_column_blob(stmt, 1);
+    fields["password"] = sqlite3_column_text(stmt, 2);
 
-    std::cout << m_userId << ' ' << m_username << ' ' << m_password << std::endl;
+    std::cout << m_userId << ' ' << m_username << ' ' << m_password
+              << std::endl;
 }
 
 void User::buildStmt(sqlite3* db, sqlite3_stmt** stmt) {
@@ -34,3 +32,5 @@ void User::buildStmt(sqlite3* db, sqlite3_stmt** stmt) {
                  )
               << '\n';
 }
+
+Field& User::operator[](const std::string& key) { return fields[key]; }
