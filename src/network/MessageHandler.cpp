@@ -2,6 +2,7 @@
 #include "User.h"
 
 #include <iostream>
+#include <variant>
 
 #include <fmt/core.h>
 #include <sqlite3.h>
@@ -30,7 +31,6 @@ void MessageHandler::handleMessages() {
 
 // TODO: placeholder
 Message MessageHandler::getResponse(Message request) {
-
     json j = json::parse(request);
 
     std::cout << j["action"] << std::endl;
@@ -55,22 +55,14 @@ Message MessageHandler::getResponse(Message request) {
 static void buildStatementFromEntity(
         User& user, sqlite3* db, sqlite3_stmt** stmt
 ) {
-
-    std::string username = user["username"];
-    std::string query    = fmt::format(
-            "SELECT * FROM users WHERE username = '{}'", username.c_str()
+    std::string query = fmt::format(
+            "SELECT * FROM users WHERE username = '{}'", user["username"]
     );
     int ret = sqlite3_prepare_v2(db, query.c_str(), query.length(), stmt, 0);
     if (ret) {
         std::cerr << "Prepare failed\n";
         return;
     }
-
-    //    std::cout << "Bind ret: "
-    //              << sqlite3_bind_text(
-    //                         *stmt, 1, username.c_str(), username.length(), nullptr
-    //                 )
-    //              << '\n';
 }
 
 // TODO: this is temporary, will be moved in db object
@@ -95,7 +87,7 @@ bool MessageHandler::handleLogin(json jsonRequest) {
     sqlite3_stmt* stmt;
 
     std::string username = jsonRequest["data"]["username"];
-    User user(username);
+    User        user(username);
     buildStatementFromEntity(user, dbHandle, &stmt);
 
     sqlite3_step(stmt);
@@ -107,6 +99,11 @@ bool MessageHandler::handleLogin(json jsonRequest) {
               << user2["password"] << '\n';
 
     sqlite3_finalize(stmt);
+
+    json j;
+    j["userId"]   = user2["userId"];
+    j["username"] = user2["username"];
+    j["password"] = user2["password"];
 
     return true;
 }
