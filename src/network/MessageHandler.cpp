@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+#include <fmt/core.h>
 #include <sqlite3.h>
 
 using json = nlohmann::json;
@@ -51,21 +52,25 @@ Message MessageHandler::getResponse(Message request) {
 }
 
 // TODO: this is temporary, will be moved in db object
-static void buildStatementFromEntity(User& user, sqlite3* db, sqlite3_stmt** stmt) {
-    std::string query = "SELECT * FROM users WHERE username = ?";
+static void buildStatementFromEntity(
+        User& user, sqlite3* db, sqlite3_stmt** stmt
+) {
+
+    std::string username = user["username"];
+    std::string query    = fmt::format(
+            "SELECT * FROM users WHERE username = '{}'", username.c_str()
+    );
     int ret = sqlite3_prepare_v2(db, query.c_str(), query.length(), stmt, 0);
     if (ret) {
         std::cerr << "Prepare failed\n";
         return;
     }
 
-    std::string username = user["username"];
-    std::cout << "Bind ret: "
-              << sqlite3_bind_text(
-                         *stmt, 1, username.c_str(), username.length(),
-                         nullptr
-                 )
-              << '\n';
+    //    std::cout << "Bind ret: "
+    //              << sqlite3_bind_text(
+    //                         *stmt, 1, username.c_str(), username.length(), nullptr
+    //                 )
+    //              << '\n';
 }
 
 // TODO: this is temporary, will be moved in db object
@@ -77,10 +82,10 @@ static void readEntityFromStatement(User& user, sqlite3_stmt* stmt) {
 }
 
 bool MessageHandler::handleLogin(json jsonRequest) {
-    sqlite3*    dbHandle;
-    int         ret = sqlite3_open("../db/auction_house.db", &dbHandle);
-    char*       errorMessage;
-    std::string data = "CALLBACK";
+    sqlite3* dbHandle;
+
+    int   ret = sqlite3_open("../db/auction_house.db", &dbHandle);
+    char* errorMessage;
 
     if (ret) {
         std::cerr << "Error opening db\n";
@@ -89,7 +94,8 @@ bool MessageHandler::handleLogin(json jsonRequest) {
 
     sqlite3_stmt* stmt;
 
-    User user("admin");
+    std::string username = jsonRequest["data"]["username"];
+    User user(username);
     buildStatementFromEntity(user, dbHandle, &stmt);
 
     sqlite3_step(stmt);

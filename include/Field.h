@@ -39,6 +39,10 @@ public:
     Field& operator=(const void* value) {
         using boost::lexical_cast;
 
+        if (!value) {
+            return *this;
+        }
+
         auto buffer = static_cast<const char*>(value);
 
         switch (m_type) {
