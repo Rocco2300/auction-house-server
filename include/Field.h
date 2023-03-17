@@ -105,6 +105,14 @@ public:
         return *static_cast<int*>(m_value);
     }
 
+    operator std::string() {
+        if (!isString()) {
+            throw std::bad_cast();
+        }
+
+        return *static_cast<std::string*>(m_value);
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const Field& field) {
         switch (field.m_type) {
         case Type::Integer:
