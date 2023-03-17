@@ -17,9 +17,10 @@ def find_fields(lines):
     fields = []
     for i in range(len(lines)):
         line = lines[i]
+        normalized_line = ' '.join(line.split())
 
         field_regex = re.compile(r'(?!return\b)\b[A-Za-z_:]+\s\w+{?}?;+$')
-        field = field_regex.search(line)
+        field = field_regex.search(normalized_line)
 
         if field is not None:
             fields.append(field.group(0))
@@ -87,7 +88,7 @@ def find_insert_index(lines):
 def build_metadata(var_name_list):
     fields_map = '\tstd::unordered_map<std::string, Field> fields = {\n'
     for var_name in var_name_list:
-        fields_map += '\t\t{"' + undecorated(var_name) + '", ' + var_name + '},\n'
+        fields_map += '\t\t\t{"' + undecorated(var_name) + '", ' + var_name + '},\n'
     fields_map += '\t};\n'
     return fields_map
 

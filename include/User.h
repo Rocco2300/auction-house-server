@@ -6,18 +6,17 @@
 
 #include <sqlite3.h>
 
-class User
-{
+class User {
 private:
-    int m_userId{};
+    int         m_userId{};
     std::string m_username{};
     std::string m_password{};
 
 #pragma FIELDS
     std::unordered_map<std::string, Field> fields = {
-            {"userId", Field(m_userId)},
-            {"username", Field(m_username)},
-            {"password", Field(m_password)}
+            {"userId", m_userId},
+            {"username", m_username},
+            {"password", m_password},
     };
 
 public:
