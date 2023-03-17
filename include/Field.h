@@ -4,6 +4,11 @@
 #include <stdexcept>
 
 #include <boost/lexical_cast.hpp>
+#include <fmt/core.h>
+#include <nlohmann/json.hpp>
+
+
+using json = nlohmann::json;
 
 class Field {
 private:
@@ -16,6 +21,8 @@ private:
 public:
     using Type  = ValueType;
     using Value = void* const;
+
+    friend fmt::formatter<Field>;
 
 private:
     Type  m_type{};
@@ -117,6 +124,30 @@ public:
         return *static_cast<std::string*>(m_value);
     }
 
+    operator json() {
+        if (!m_value) {
+            throw std::bad_cast();
+        }
+
+        int         integer;
+        float       floating;
+        std::string string;
+
+        switch (m_type) {
+        case Type::Integer:
+            integer = *static_cast<int*>(m_value);
+            return static_cast<json>(integer);
+        case Type::Floating:
+            floating = *static_cast<float*>(m_value);
+            return static_cast<json>(floating);
+        case Type::String:
+            string = *static_cast<std::string*>(m_value);
+            return static_cast<json>(string);
+        }
+
+        throw std::bad_cast();
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const Field& field) {
         switch (field.m_type) {
         case Type::Integer:
@@ -141,4 +172,37 @@ private:
     bool isNumeric() { return isInteger() || isFloating(); }
 
     bool isString() { return m_type == Type::String; }
+};
+
+template<>
+struct fmt::formatter<Field>
+{
+    template<typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+        return ctx.begin();
+    }
+
+    template<typename FormatContext>
+    auto format(const Field& field, FormatContext& ctx) {
+        if (!field.m_value) {
+            throw std::logic_error("Cannot format NULL m_value*");
+        }
+
+        switch (field.m_type) {
+        case Field::Type::Integer:
+            return fmt::format_to(
+                    ctx.out(), "{}", *static_cast<int*>(field.m_value)
+            );
+        case Field::Type::Floating:
+            return fmt::format_to(
+                    ctx.out(), "{}", *static_cast<float*>(field.m_value)
+            );
+        case Field::Type::String:
+            return fmt::format_to(
+                    ctx.out(), "{}", *static_cast<std::string*>(field.m_value)
+            );
+        }
+
+        throw std::logic_error("Unhandled type case in format");
+    }
 };
