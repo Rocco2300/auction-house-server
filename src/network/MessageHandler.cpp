@@ -50,6 +50,32 @@ Message MessageHandler::getResponse(Message request) {
     return "invalid request";
 }
 
+// TODO: this is temporary, will be moved in db object
+static void buildStatementFromEntity(User& user, sqlite3* db, sqlite3_stmt** stmt) {
+    std::string query = "SELECT * FROM users WHERE username = ?";
+    int ret = sqlite3_prepare_v2(db, query.c_str(), query.length(), stmt, 0);
+    if (ret) {
+        std::cerr << "Prepare failed\n";
+        return;
+    }
+
+    std::string username = user["username"];
+    std::cout << "Bind ret: "
+              << sqlite3_bind_text(
+                         *stmt, 1, username.c_str(), username.length(),
+                         nullptr
+                 )
+              << '\n';
+}
+
+// TODO: this is temporary, will be moved in db object
+static void readEntityFromStatement(User& user, sqlite3_stmt* stmt) {
+    for (int i = 0; i < user.size(); i++) {
+        auto field = user[i];
+        field      = sqlite3_column_blob(stmt, i);
+    }
+}
+
 bool MessageHandler::handleLogin(json jsonRequest) {
     sqlite3*    dbHandle;
     int         ret = sqlite3_open("../db/auction_house.db", &dbHandle);
@@ -64,25 +90,15 @@ bool MessageHandler::handleLogin(json jsonRequest) {
     sqlite3_stmt* stmt;
 
     User user("admin");
-    user.buildStmt(dbHandle, &stmt);
-
-//    std::string query = "SELECT * FROM users WHERE username = ?";
-//    ret = sqlite3_prepare_v2(dbHandle, query.c_str(), query.length(), &stmt, 0);
-//    if (ret) {
-//        std::cerr << "Prepare failed\n";
-//    }
-//
-//    std::string username = jsonRequest["data"]["username"];
-//    std::cout << "Bind ret: "
-//              << sqlite3_bind_text(
-//                         stmt, 1, username.c_str(), username.length(), nullptr
-//                 )
-//              << '\n';
+    buildStatementFromEntity(user, dbHandle, &stmt);
 
     sqlite3_step(stmt);
 
     User user2;
-    user2 = stmt;
+    readEntityFromStatement(user2, stmt);
+
+    std::cout << user2["userId"] << ' ' << user2["username"] << ' '
+              << user2["password"] << '\n';
 
     sqlite3_finalize(stmt);
 

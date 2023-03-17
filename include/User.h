@@ -4,8 +4,6 @@
 
 #include <unordered_map>
 
-#include <sqlite3.h>
-
 class User {
 private:
     int         m_userId{};
@@ -13,6 +11,12 @@ private:
     std::string m_password{};
 
 #pragma FIELDS
+    std::vector<std::string> fieldKeys = {
+            "userId",
+            "username",
+            "password",
+    };
+
     std::unordered_map<std::string, Field> fields = {
             {"userId", m_userId},
             {"username", m_username},
@@ -23,8 +27,8 @@ public:
     User() = default;
     User(std::string username, std::string password = "");
 
-    void operator=(sqlite3_stmt* stmt);
-    void buildStmt(sqlite3* db, sqlite3_stmt** stmt);
+    size_t size();
 
+    Field& operator[](size_t index);
     Field& operator[](const std::string& key);
 };
