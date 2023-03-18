@@ -125,10 +125,6 @@ public:
     }
 
     operator json() {
-        if (!m_value) {
-            throw std::bad_cast();
-        }
-
         int         integer;
         float       floating;
         std::string string;
@@ -145,7 +141,7 @@ public:
             return static_cast<json>(string);
         }
 
-        throw std::bad_cast();
+        return static_cast<json>(nullptr);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Field& field) {
