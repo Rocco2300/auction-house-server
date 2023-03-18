@@ -2,7 +2,6 @@
 #include "User.h"
 
 #include <iostream>
-#include <variant>
 
 #include <fmt/core.h>
 #include <sqlite3.h>
@@ -86,8 +85,8 @@ bool MessageHandler::handleLogin(json jsonRequest) {
 
     sqlite3_stmt* stmt;
 
-    std::string username = jsonRequest["data"]["username"];
-    User        user(username);
+    User user;
+    user["username"] = jsonRequest["data"]["username"];
     buildStatementFromEntity(user, dbHandle, &stmt);
 
     sqlite3_step(stmt);
@@ -99,11 +98,6 @@ bool MessageHandler::handleLogin(json jsonRequest) {
               << user2["password"] << '\n';
 
     sqlite3_finalize(stmt);
-
-    json j;
-    j["userId"]   = user2["userId"];
-    j["username"] = user2["username"];
-    j["password"] = user2["password"];
 
     return true;
 }

@@ -12,11 +12,22 @@ using json = nlohmann::json;
 
 class Field {
 private:
-    enum class ValueType {
-        String,
-        Integer,
-        Floating
+    // Numbers to match the nlohmann impl
+    enum class ValueType : uint8_t {
+        String   = 3,
+        Integer  = 5,
+        Floating = 7
     };
+
+    friend bool operator==(json::value_t valueType1, ValueType valueType2) {
+        return static_cast<uint8_t>(valueType1) ==
+               static_cast<uint8_t>(valueType2);
+    }
+
+    friend bool operator==(ValueType valueType1, json::value_t valueType2) {
+        return static_cast<uint8_t>(valueType1) ==
+               static_cast<uint8_t>(valueType2);
+    }
 
 public:
     using Type  = ValueType;
@@ -100,6 +111,26 @@ public:
         }
 
         *static_cast<std::string* const>(m_value) = value;
+        return *this;
+    }
+
+    Field& operator=(json value) {
+        if (value.type() != m_type) {
+            return *this;
+        }
+
+        switch (m_type) {
+        case Type::Integer:
+            *static_cast<int*>(m_value) = value;
+            break;
+        case Type::Floating:
+            *static_cast<float*>(m_value) = value;
+            break;
+        case Type::String:
+            *static_cast<std::string*>(m_value) = value;
+            break;
+        }
+
         return *this;
     }
 
