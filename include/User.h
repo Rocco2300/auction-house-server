@@ -1,8 +1,8 @@
 #pragma once
 
-#include "FieldVector.h"
+#include "Entity.h"
 
-class User {
+class User : public Entity {
 private:
     int         m_userId{};
     std::string m_username{};
@@ -16,11 +16,6 @@ private:
     };
 
 public:
-    User() = default;
+    User();
     User(std::string username, std::string password = "");
-
-    size_t size();
-
-    Field& operator[](size_t index);
-    Field& operator[](const std::string& key);
 };
