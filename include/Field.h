@@ -36,20 +36,29 @@ public:
     friend fmt::formatter<Field>;
 
 private:
+    std::string m_name;
+
     Type  m_type{};
     Value m_value{};
 
 public:
     Field() = default;
-    Field(int& value)
-        : m_type(Type::Integer)
+    Field(const std::string& fieldName, int& value)
+        : m_name(fieldName)
+        , m_type(Type::Integer)
         , m_value(&value) {}
-    Field(float& value)
-        : m_type(Type::Floating)
+    Field(const std::string& fieldName, float& value)
+        : m_name(fieldName)
+        , m_type(Type::Floating)
         , m_value(&value) {}
-    Field(std::string& value)
-        : m_type(Type::String)
+    Field(const std::string& fieldName, std::string& value)
+        : m_name(fieldName)
+        , m_type(Type::String)
         , m_value(&value) {}
+
+    const std::string& name() {
+        return m_name;
+    }
 
     // This constructor is used for db interface
     // and atm sqlite3 returns blob as a char array
