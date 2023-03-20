@@ -56,7 +56,7 @@ public:
         , m_type(Type::String)
         , m_value(&value) {}
 
-    const std::string& name() {
+    const std::string& name() const {
         return m_name;
     }
 
