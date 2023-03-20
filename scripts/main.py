@@ -2,14 +2,11 @@ import re
 
 
 def parse_header(file_path):
-    file = open(file_path, "r")
-
-    lines = []
-    for line in file:
-        lines.append(line)
-
-    file.close()
-    return lines
+    ret = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            ret.append(line)
+    return ret
 
 
 def find_fields(lines):
