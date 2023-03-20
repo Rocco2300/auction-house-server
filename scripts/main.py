@@ -86,7 +86,7 @@ def find_insert_index(lines):
 
 
 def build_metadata(var_name_list):
-    fields_map = '\tstd::unordered_map<std::string, Field> fields = {\n'
+    fields_map = '\tFieldVector fields = {\n'
     for var_name in var_name_list:
         fields_map += '\t\t\t{"' + undecorated(var_name) + '", ' + var_name + '},\n'
     fields_map += '\t};\n'

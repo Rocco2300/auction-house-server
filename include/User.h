@@ -1,8 +1,6 @@
 #pragma once
 
-#include <Field.h>
-
-#include <unordered_map>
+#include "FieldVector.h"
 
 class User {
 private:
@@ -11,13 +9,7 @@ private:
     std::string m_password{};
 
 #pragma FIELDS
-    std::vector<std::string> fieldKeys = {
-            "userId",
-            "username",
-            "password",
-    };
-
-    std::unordered_map<std::string, Field> fields = {
+    FieldVector fields = {
             {"userId", m_userId},
             {"username", m_username},
             {"password", m_password},
