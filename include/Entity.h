@@ -17,6 +17,10 @@ public:
             std::string& tableName, std::string& entityName, FieldVector& fields
     );
 
+    // We use this for from_json since
+    // we cannot have default constructions
+    // since we always need to declare fields
+    // tableName and entityName
     Entity& operator=(const json& other);
 
     virtual size_t size() const;

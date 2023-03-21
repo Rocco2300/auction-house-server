@@ -186,26 +186,6 @@ public:
         return *static_cast<std::string*>(m_value);
     }
 
-    operator json() {
-        int         integer;
-        float       floating;
-        std::string string;
-
-        switch (m_type) {
-        case Type::Integer:
-            integer = *static_cast<int*>(m_value);
-            return static_cast<json>(integer);
-        case Type::Floating:
-            floating = *static_cast<float*>(m_value);
-            return static_cast<json>(floating);
-        case Type::String:
-            string = *static_cast<std::string*>(m_value);
-            return static_cast<json>(string);
-        }
-
-        return static_cast<json>(nullptr);
-    }
-
     friend std::ostream& operator<<(std::ostream& os, const Field& field) {
         switch (field.m_type) {
         case Type::Integer:
@@ -266,8 +246,6 @@ struct fmt::formatter<Field>
 };
 
 inline void from_json(json& j, Field& field) {
-    std::cout << "in field\n";
-
     switch (field.m_type) {
     case Field::Type::Integer:
         *static_cast<int*>(field.m_value) = j;

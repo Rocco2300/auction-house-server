@@ -8,8 +8,6 @@ Entity::Entity(
     , m_fields(&fields) {}
 
 Entity& Entity::operator=(const json& other) {
-    std::cout << "in entity\n";
-
     json temp = other.at(*m_entityName);
 
     for (const auto& x : temp.items()) {
