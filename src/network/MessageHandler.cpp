@@ -1,4 +1,5 @@
 #include "MessageHandler.h"
+#include "Db.h"
 #include "User.h"
 
 #include <iostream>
@@ -67,8 +68,7 @@ static void buildStatementFromEntity(
 // TODO: this is temporary, will be moved in db object
 static void readEntityFromStatement(User& user, sqlite3_stmt* stmt) {
     for (int i = 0; i < user.size(); i++) {
-        auto field = user[i];
-        field      = sqlite3_column_blob(stmt, i);
+        user[i] = sqlite3_column_blob(stmt, i);
     }
 }
 
@@ -83,25 +83,15 @@ bool MessageHandler::handleLogin(json jsonRequest) {
         return false;
     }
 
-    sqlite3_stmt* stmt;
 
     User user;
     user["username"] = jsonRequest["data"]["username"];
-    buildStatementFromEntity(user, dbHandle, &stmt);
+    ReadDbEntity(dbHandle, user);
 
-    sqlite3_step(stmt);
+    std::cout << user["userId"] << ' ' << user["username"] << '\n';
 
-    User user2;
-    readEntityFromStatement(user2, stmt);
-
-    std::cout << user2["userId"] << ' ' << user2["username"] << ' '
-              << user2["password"] << '\n';
-
-    json testJson(user2);
-
-    std::cout << testJson.dump(4) << std::endl;
-
-    sqlite3_finalize(stmt);
+    json entJson = user;
+    std::cout << entJson.dump(4) << '\n';
 
     return true;
 }

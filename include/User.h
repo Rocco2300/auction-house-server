@@ -22,4 +22,5 @@ public:
     explicit User(std::string username, std::string password = "");
 
     User& operator=(const json& other);
+    User& operator=(const User& other);
 };

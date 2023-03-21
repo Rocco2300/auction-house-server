@@ -169,6 +169,8 @@ public:
 
     const std::string& name() const { return m_name; }
 
+    const Type& type() const { return m_type; }
+
     operator int() {
         if (!isNumeric()) {
             throw std::bad_cast();
@@ -222,6 +224,8 @@ public:
             return *static_cast<std::string*>(f1.m_value) ==
                    *static_cast<std::string*>(f2.m_value);
         }
+
+        return false;
     }
 
 private:

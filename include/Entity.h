@@ -22,15 +22,23 @@ public:
     // since we always need to declare fields
     // tableName and entityName
     Entity& operator=(const json& other);
+    Entity& operator=(const Entity& other);
 
     virtual size_t size() const;
     virtual std::string name() const;
+    virtual std::string tableName() const;
 
     virtual Field& operator[](size_t index);
     virtual Field& operator[](const std::string& key);
 
     virtual const Field& operator[](size_t index) const;
     virtual const Field& operator[](const std::string& key) const;
+
+    virtual Field& at(size_t index);
+    virtual Field& at(const std::string& key);
+
+    virtual const Field& at(size_t index) const;
+    virtual const Field& at(const std::string& key) const;
 };
 
 inline void to_json(json& j, const Entity& entity) {

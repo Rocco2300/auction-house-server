@@ -15,3 +15,7 @@ User::User(std::string username, std::string password)
 User& User::operator=(const json& other) {
     return dynamic_cast<User&>(Entity::operator=(other));
 }
+
+User& User::operator=(const User& other) {
+    return dynamic_cast<User&>(Entity::operator=(other));
+}
