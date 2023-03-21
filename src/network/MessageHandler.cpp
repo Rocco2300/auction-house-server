@@ -97,6 +97,20 @@ bool MessageHandler::handleLogin(json jsonRequest) {
     std::cout << user2["userId"] << ' ' << user2["username"] << ' '
               << user2["password"] << '\n';
 
+    json testJson(user2);
+
+    std::cout << testJson.dump(4) << std::endl;
+
+    User user3;
+
+    try {
+        user3 = testJson;
+
+        std::cout << user3["username"] << ' ' << user3["password"] << '\n';
+    } catch (std::exception& e) {
+        std::cout << e.what() << '\n';
+    }
+
     sqlite3_finalize(stmt);
 
     return true;

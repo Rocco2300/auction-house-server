@@ -34,6 +34,8 @@ public:
     using Value = void* const;
 
     friend fmt::formatter<Field>;
+    friend void from_json(json& j, Field& field);
+    friend void to_json(json& j, const Field& field);
 
 private:
     std::string m_name;
@@ -56,8 +58,26 @@ public:
         , m_type(Type::String)
         , m_value(&value) {}
 
-    const std::string& name() const {
-        return m_name;
+
+    Field& operator=(const Field& other) {
+        if (m_type != other.m_type) {
+            throw std::logic_error("Field types not matching.");
+        }
+
+        switch (m_type) {
+        case Type::Integer:
+            *static_cast<int*>(m_value) = *static_cast<int*>(other.m_value);
+            break;
+        case Type::Floating:
+            *static_cast<float*>(m_value) = *static_cast<float*>(other.m_value);
+            break;
+        case Type::String:
+            *static_cast<std::string*>(m_value) =
+                    *static_cast<std::string*>(other.m_value);
+            break;
+        }
+
+        return *this;
     }
 
     // This constructor is used for db interface
@@ -142,6 +162,8 @@ public:
 
         return *this;
     }
+
+    const std::string& name() const { return m_name; }
 
     operator int() {
         if (!isNumeric()) {
@@ -242,3 +264,33 @@ struct fmt::formatter<Field>
         throw std::logic_error("Unhandled type case in format");
     }
 };
+
+inline void from_json(json& j, Field& field) {
+    std::cout << "in field\n";
+
+    switch (field.m_type) {
+    case Field::Type::Integer:
+        *static_cast<int*>(field.m_value) = j;
+        break;
+    case Field::Type::Floating:
+        *static_cast<float*>(field.m_value) = j;
+        break;
+    case Field::Type::String:
+        *static_cast<std::string*>(field.m_value) = j;
+        break;
+    };
+}
+
+inline void to_json(json& j, const Field& field) {
+    switch (field.m_type) {
+    case Field::Type::Integer:
+        j = *static_cast<int*>(field.m_value);
+        break;
+    case Field::Type::Floating:
+        j = *static_cast<float*>(field.m_value);
+        break;
+    case Field::Type::String:
+        j = *static_cast<std::string*>(field.m_value);
+        break;
+    };
+}

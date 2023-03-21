@@ -8,6 +8,8 @@ private:
     std::string m_username{};
     std::string m_password{};
 
+    std::string tableName = "users";
+    std::string entityName = "user";
 #pragma FIELDS
     FieldVector fields = {
             {"userId", m_userId},
@@ -17,5 +19,7 @@ private:
 
 public:
     User();
-    User(std::string username, std::string password = "");
+    explicit User(std::string username, std::string password = "");
+
+    User& operator=(const json& other);
 };
