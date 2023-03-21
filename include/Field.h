@@ -10,41 +10,44 @@
 
 using json = nlohmann::json;
 
+// Numbers to match the nlohmann impl
+enum class FieldType : uint8_t {
+    String   = 3,
+    Integer  = 5,
+    Floating = 7
+};
+
 class Field {
-private:
-    // Numbers to match the nlohmann impl
-    enum class ValueType : uint8_t {
-        String   = 3,
-        Integer  = 5,
-        Floating = 7
-    };
-
-    friend bool operator==(json::value_t valueType1, ValueType valueType2) {
-        return static_cast<uint8_t>(valueType1) ==
-               static_cast<uint8_t>(valueType2);
-    }
-
-    friend bool operator==(ValueType valueType1, json::value_t valueType2) {
-        return static_cast<uint8_t>(valueType1) ==
-               static_cast<uint8_t>(valueType2);
-    }
-
 public:
-    using Type  = ValueType;
-    using Value = void* const;
+    using Type  = FieldType;
+    using Value = void*;
 
     friend fmt::formatter<Field>;
     friend void from_json(json& j, Field& field);
     friend void to_json(json& j, const Field& field);
 
 private:
-    std::string m_name;
+    std::string m_name{};
 
     Type  m_type{};
     Value m_value{};
 
 public:
     Field() = default;
+    Field(Type type)
+        : m_type(type) {
+        switch (m_type) {
+        case Type::Integer:
+            m_value = std::calloc(1, sizeof(int));
+            break;
+        case Type::Floating:
+            m_value = std::calloc(1, sizeof(float));
+            break;
+        case Type::String:
+            m_value = std::calloc(1, sizeof(std::string));
+            break;
+        }
+    }
     Field(const std::string& fieldName, int& value)
         : m_name(fieldName)
         , m_type(Type::Integer)
@@ -144,7 +147,8 @@ public:
     }
 
     Field& operator=(json value) {
-        if (value.type() != m_type) {
+        if (static_cast<uint8_t>(value.type()) !=
+            static_cast<uint8_t>(m_type)) {
             return *this;
         }
 
@@ -200,6 +204,24 @@ public:
         };
 
         return os;
+    }
+
+    friend bool operator==(const Field& f1, const Field& f2) {
+        if (f1.m_type != f2.m_type) {
+            return false;
+        }
+
+        switch (f1.m_type) {
+        case Type::Integer:
+            return *static_cast<int*>(f1.m_value) ==
+                   *static_cast<int*>(f2.m_value);
+        case Type::Floating:
+            return *static_cast<float*>(f1.m_value) ==
+                   *static_cast<float*>(f2.m_value);
+        case Type::String:
+            return *static_cast<std::string*>(f1.m_value) ==
+                   *static_cast<std::string*>(f2.m_value);
+        }
     }
 
 private:
