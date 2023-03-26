@@ -52,7 +52,11 @@ void Listener::onAccept(beast::error_code ec, tcp::socket socket) {
     if (ec) {
         logFail(ec, "Accept");
     } else {
-        std::make_shared<Session>(std::move(socket), m_messageHandler, m_sessionManager)->run();
+        // clang-format off
+        std::make_shared<Session>(
+                std::move(socket), m_messageHandler, m_sessionManager
+        )->run();
+        // clang-format on
     }
 
     doAccept();
